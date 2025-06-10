@@ -1,4 +1,3 @@
---
 SELECT *
 FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
 WHERE CTYNAME= 'China'
