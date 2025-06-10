@@ -1,0 +1,52 @@
+SELECT *
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+WHERE CTYNAME= 'China'
+
+-- checking for null or missing value
+SELECT COUNT(*) AS total_rows,
+       COUNT(EYR) AS non_null_rows,
+       COUNT(*) - COUNT(EYR) AS null_count
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+--- There were no missing values in all the columns
+
+-- checking for duplicate value
+SELECT CTY_CODE,
+       CTYNAME,
+      COUNT(*) AS DUPLICATE_COUNT
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+WHERE upper(CTYNAME) IN ('CHINA','VIETNAM','THAILAND','JAPAN','CAMBODIA','SOUTH AFRICA','TAIWAN','EUROPEAN UNION')
+GROUP BY CTY_CODE, CTYNAME
+HAVING COUNT (*) >1
+
+-- checking for the number of countries. There are 259 CTYNAMES
+SELECT CTYNAME, COUNT (*) AS Number_of_duplicate
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+GROUP BY CTYNAME
+
+-- OR
+
+SELECT DISTINCT (CTYNAME)
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+
+-- Check for Case Inconsistencies
+SELECT Proper (CTYNAME)
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+
+-- OR
+
+SELECT 
+  LOWER(CTYNAME) AS normalized_name,
+  ARRAY_AGG(DISTINCT CTYNAME) AS actual_variants,
+  COUNT(*) AS total_rows
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+GROUP BY normalized_name
+HAVING ARRAY_LENGTH(ARRAY_AGG(DISTINCT CTYNAME)) > 1;
+
+-- I what to get data on these 8 countries ( China, Vietnam, Thailand, Japan, Cambodia, South Africa, Taiwan and the European Union)
+-- I am focusing on a 11 year period
+
+CREATE TABLE `balance-of-trade-us-and-china.US_Trade.US_Trading_Imbalance_With_Eight_Countries` AS
+SELECT *
+FROM `balance-of-trade-us-and-china.US_Import_And_Export_On_China.Countries`
+WHERE UPPER(CTYNAME) IN ('CHINA','VIETNAM','THAILAND','JAPAN','CAMBODIA','SOUTH AFRICA','TAIWAN','EUROPEAN UNION')
+AND year BETWEEN 2014 AND 2024
